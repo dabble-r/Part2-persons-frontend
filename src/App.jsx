@@ -14,12 +14,25 @@ const App = () => {
     setNewName(event.target.value)
   }
 
+  const newNameExists = () => {
+    for (let i = 0; i < persons.length; i++) {
+      if (persons[i]['name'].toLowerCase() === newName.toLowerCase()) {
+        return true;
+      }
+    }
+  }
+
   const newNameSubmit = (event) => {
     event.preventDefault();
-    persons.push({name: newName})
+      if (newNameExists()) {
+        window.alert(`${newName} already exists!`)
+      } else if (!newNameExists()) {
+        persons.push({name: newName})
+        setPersons(persons);
+      }
+      
+      resetNewName()
     //console.log(newName)
-    setPersons(persons)
-    resetNewName()
   }
 
   const resetNewName = () => {

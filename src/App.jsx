@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import Filter from './Components/Filter'
+import New_Person from './Components/New_Person'
+import All_Persons from './Components/All_Persons'
 
 const App = () => {
 
@@ -57,67 +60,59 @@ const App = () => {
     setNewNumber(event.target.value)
   }
 
-  
+  // set name to filter 
   const filterNameHandler = (event) => {
     event.preventDefault();
     setFilter(event.target.value);
   }
 
+  // if name to filter exists, update filter obj to existing person
   const checkFilterExists = () => {
     for (let i = 0; i < persons.length; i++) {
       if (persons[i]['name'].toLowerCase() === filter.toLowerCase()) {
         filterObj['name'] = persons[i]['name'];
         filterObj['number'] = persons[i]['number'];
         setFilterObj(filterObj);
-      }
+      } 
     }
   }
 
+  // on click, dispay alert message with filtered name if it exists
   const submitFilter = (event) => {
     event.preventDefault();
     checkFilterExists();
-    window.alert(`${filterObj['name']} : ${filterObj['number']}`)
-    resetFilter('')
+    if (filterObj['name']) {
+      window.alert(`${filterObj['name']} : ${filterObj['number']}`)
+    } else {
+      window.alert('Name does not exist')
+    }
+    resetFilter()
+    resetFilterObj()
   }
 
   const resetFilter = () => {
     setFilter('');
   }
 
+  const resetFilterObj = () => {
+    setFilterObj({});
+  }
+
+
   return (
     <div>
       <h1>Phonebook</h1>
-      <form>
-        <div>
-          filter: <input onChange={filterNameHandler} value={filter}/>
-          <div>
-            <button type="submit" onClick={submitFilter}>search</button>
-          </div>
-          <div>
-            debug: {filter}
-          </div>
-        </div>
-      </form>
-      <form>
-        <h2>Add new:</h2>
-        <div>
-          name: <input onChange={newNameHandler} value={newName}/>
-          <br></br>
-          number: <input onChange={newNumberHandler} value={newNumber}/>
-        </div>
-        <div>
-          <button type="submit" onClick={newNameSubmit}>add</button>
-        </div>
-        <div>
-          debug: {newName}
-          <br></br>
-          debug: {newNumber}
-        </div>
-      </form>
+
+      <Filter filterHandler={filterNameHandler} filter={filter} submitFilter={submitFilter} />
+
+      <New_Person newNameHandler={newNameHandler} newName={newName} newNumberHandler={newNumberHandler} 
+                  newNumber={newNumber} newNameSubmit={newNameSubmit} debugNewNumber={newNumber} debugNewName={newName} />
+
+
+      
       <h2>Numbers:</h2>
-        <ul>
-          {persons.map(ele=> <li key={ele.name}>{ele.name ? ele.name : 'Phonebook empty'} {ele.number ? '--' + ele.number : ''}</li>)}
-        </ul>
+        
+        <All_Persons persons={persons} />
     </div>
   )
 }

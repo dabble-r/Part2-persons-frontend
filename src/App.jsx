@@ -7,6 +7,7 @@ const App = () => {
   ]) 
 
   const [newName, setNewName] = useState('');
+  const [newNumber, setNewNumber] = useState('');
 
 
   const newNameHandler = (event) => {
@@ -27,17 +28,29 @@ const App = () => {
       if (newNameExists()) {
         window.alert(`${newName} already exists!`)
       } else if (!newNameExists()) {
-        persons.push({name: newName})
+        persons.push({name: newName, number: newNumber})
         setPersons(persons);
       }
-      
-      resetNewName()
+      resetNewName();
+      resetNewNumber();
     //console.log(newName)
   }
 
   const resetNewName = () => {
-    setNewName('')
+    setNewName('');
   }
+
+  const resetNewNumber = () => {
+    setNewNumber('');
+  }
+
+  const newNumberHandler = (event) => {
+    event.preventDefault();
+    setNewNumber(event.target.value)
+  }
+
+  
+
 
   return (
     <div>
@@ -45,17 +58,21 @@ const App = () => {
       <form>
         <div>
           name: <input onChange={newNameHandler} value={newName}/>
+          <br></br>
+          number: <input onChange={newNumberHandler} value={newNumber}/>
         </div>
         <div>
           <button type="submit" onClick={newNameSubmit}>add</button>
         </div>
         <div>
           debug: {newName}
+          <br></br>
+          debug: {newNumber}
         </div>
       </form>
       <h2>Numbers</h2>
         <ul>
-          {persons.map(ele=> <li key={ele.name}>{ele.name}</li>)}
+          {persons.map(ele=> <li key={ele.name}>{ele.name ? ele.name : 'Phonebook empty'} {ele.number ? '--' + ele.number : ''}</li>)}
         </ul>
     </div>
   )

@@ -3,29 +3,43 @@ import axios from 'axios'
 import Filter from './Components/Filter'
 import New_Person from './Components/New_Person'
 import All_Persons from './Components/All_Persons'
+import personsService from './services/persons'
 
 const App = () => {
 
   const [persons, setPersons] = useState([]) 
-
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
   const [filterObj, setFilterObj] = useState({});
+  const [id, setId] = useState([]);
 
-
+// effect hook, render once, initial state of persons array (db.json)
 useEffect(() => {
-  axios 
-    .get('http://localhost:3001/persons')
-    .then(response => {
-      const data = response.data;
-      //console.log(data)
-      //persons.push(data)
-      setPersons(data)
-    })
+  personsService  
+      .getAll()
+      .then(initialPersons=>setPersons(initialPersons))
 },[])
 
+/*
+// create new person on db
+personsService 
+  .create(personObj)
+  .then(returnPerson => {
+    setPersons(persons.concat(returnPerson))
+    resetNewName()
+    resetNewNumber()
+  })
 
+// update person on db
+  personsService 
+    .update(id, changedPerson) 
+    .then(returnPerson => {
+      setPersons(persons.concat(returnPerson))
+      resetNewName()
+      resetNewNumber()
+    })
+  */
 
   // update input name to add
   const newNameHandler = (event) => {
@@ -42,15 +56,31 @@ useEffect(() => {
     }
   }
 
+ // id generator for new person
+ /*
+const idGenerator = () => {
+  let temp = Math.floor(Math.random() * 1000)
+  setId(id.concat(temp))
+}
+  */
+
  // if name to add does not exists, add to perosns array of objs
-  const newNameSubmit = (event) => {
+  const newPersonSubmit = (event) => {
     event.preventDefault();
+    
+    let personObj = {};
       if (newNameExists()) {
         window.alert(`${newName} already exists!`)
       } else if (!newNameExists()) {
-        persons.push({name: newName, number: newNumber})
-        setPersons(persons);
+        personObj['name'] = newName;
+        personObj['number'] = newNumber;
+        personObj['id'] = id.pop();
       }
+      personsService 
+        .create(personObj)
+        .then(returnPerson => {
+          setPersons(persons.concat(returnPerson))
+     })
       resetNewName();
       resetNewNumber();
     //console.log(newName)
@@ -118,7 +148,7 @@ useEffect(() => {
       <Filter filterHandler={filterNameHandler} filter={filter} submitFilter={submitFilter} />
 
       <New_Person newNameHandler={newNameHandler} newName={newName} newNumberHandler={newNumberHandler} 
-                  newNumber={newNumber} newNameSubmit={newNameSubmit} debugNewNumber={newNumber} debugNewName={newName} />
+                  newNumber={newNumber} newNameSubmit={newPersonSubmit} debugNewNumber={newNumber} debugNewName={newName} />
 
 
       

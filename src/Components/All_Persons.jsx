@@ -5,7 +5,7 @@ const All_Persons = (props) => {
     <>
       <div>
         <ul>
-          {props.persons.map(ele=> <li key={ele.name}>{ele.name ? ele.name : 'Phonebook empty'} {ele.number ? '--' + ele.number : ''}</li>)}
+          {props.persons.length ? props.persons.map(ele=> <li key={ele.name}>{ele.name ? ele.name : 'Phonebook empty'} {ele.number ? '--' + ele.number : ''}</li>) : ""}
         </ul>
       </div>
     

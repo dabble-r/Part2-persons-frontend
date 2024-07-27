@@ -3,6 +3,7 @@ import axios from 'axios'
 import Filter from './Components/Filter'
 import New_Person from './Components/New_Person'
 import All_Persons from './Components/All_Persons'
+import Notification from './Components/Notification'
 import personsService from './services/persons'
 
 const App = () => {
@@ -12,6 +13,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
   const [filterObj, setFilterObj] = useState({});
+  const [notification, setNotification] = useState(null);
   
 
 // effect hook, render once, initial state of persons array (db.json)
@@ -65,28 +67,41 @@ const idGenerator = () => {
   return temp;
 }
 
-
+// create new person function
  // if name to add does not exists, add to perosns array of objs
   const newPersonSubmit = (event) => {
     event.preventDefault();
-    let ranId = String(idGenerator());
-
-    let personObj = {};
+    
       if (newNameExists()) {
-        window.alert(`${newName} already exists!`)
-      } else if (!newNameExists()) {
+        setNotification('Name already exists!')
+        setTimeout(() => setNotification(null),1000)
+      } 
+      if (!newNameExists()) {
+        let personObj = {};
+        let ranId = String(idGenerator());
         personObj['name'] = newName;
         personObj['number'] = newNumber;
         personObj['id'] = ranId;
-      }
+      
       personsService 
         .create(personObj)
         .then(returnPerson => {
           setPersons(persons.concat(returnPerson))
      })
+    }
       resetNewName();
       resetNewNumber();
     //console.log(newName)
+  }
+
+  // delete person function
+  const deletePersonById = (event) => {
+    event.preventDefault();
+    let id = event.target.value;
+    
+    personsService  
+      .deleteById(id)
+      .then(returnPersons => setPersons(persons.filter(ele => ele.id !== id)))
   }
 
  // reset new name to add
@@ -143,18 +158,12 @@ const idGenerator = () => {
     setFilterObj({});
   }
 
-  const deletePersonById = (event) => {
-    event.preventDefault();
-    let id = event.target.value;
-    
-    personsService  
-      .deleteById(id)
-      .then(returnPersons => setPersons(persons.filter(ele => ele.id !== id)))
-  }
-
+  
   return (
     <div>
       <h1>Phonebook</h1>
+
+      <Notification notification={notification} />
 
       <Filter filterHandler={filterNameHandler} filter={filter} submitFilter={submitFilter} />
 

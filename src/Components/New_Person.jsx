@@ -8,7 +8,8 @@ const New_Person = (props) => {
 
         <div>
           name: <input onChange={props.newNameHandler} value={props.newName}/>
-          <br></br>
+          <span><br></br></span>
+          <span><br></br></span>
           number: <input onChange={props.newNumberHandler} value={props.newNumber}/>
         </div>
 

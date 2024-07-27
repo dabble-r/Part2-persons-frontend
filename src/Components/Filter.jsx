@@ -5,7 +5,9 @@ const Filter = (props) => {
               <form>
                 <div>
                   filter: <input onChange={props.filterHandler} value={props.filter}/>
+                  
                   <div>
+                  <span><br></br></span>
                     <button type="submit" onClick={props.submitFilter}>search</button>
                   </div>
                   <div>

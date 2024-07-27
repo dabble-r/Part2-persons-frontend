@@ -59,45 +59,49 @@ const idGenerator = () => {
 
 //functio to check if newNumber is a number
 const isNumber = (num) => {
-  return typeof num === 'number';
+  //let test = Number(num);
+  return Number(num) == num;
 }
 
 
  // if name to add does not exists, add to perosns array of objs
   const newPersonSubmit = (event) => {
     event.preventDefault();
-    checkUpdatePersonExists();
+    //checkUpdatePersonExists();
     //console.log('found', updatePerson)
 
-      if (updatePerson['name']) {
-        //console.log('found', filterObj)
+      if (checkUpdatePersonExists()) {
         let id = updatePerson['id'];
-        let number = updatePerson['number']
+          //console.log('updateperson', updatePerson)
         if (window.confirm(`${newName} already exists! Would you like to update the phone number?`)) {
-          if (isNumber(number)) {
+          if (isNumber(newNumber)) {
+            console.log('number', isNumber(newNumber))
             updatePerson['number'] = newNumber;
-            // update found perosn with new number
+
+            // update found person with new number
           personsService  
             .update(id, updatePerson)
             .then(returnPerson => {
                 setPersons(persons.map(ele => ele.id !== id ? ele : returnPerson));
               })
             .catch(error => {
-                setNotification(`There was an error updating ${updatePerson['name']}`)
+                setNotification(`There was an error updating ${updatePerson['name']} \n ${error}`)
               })
-          } else if (!isNumber(number)) {
+          } else if (!isNumber(newNumber)) {
             setNotification(`${newNumber} is not a number`)
             setTimeout(() => setNotification(null), 2000)
           } 
         }
       } 
-      if (!updatePerson['name']) {
+      else if (!checkUpdatePersonExists()) {
+        
         if (isNumber(newNumber)) {
           let ranId = String(idGenerator());
           newPerson['name'] = newName;
           newPerson['number'] = newNumber;
           newPerson['id'] = ranId;
             setNewPerson(newPerson);
+
         // create new person if no person found
         personsService 
           .create(newPerson)
@@ -105,18 +109,19 @@ const isNumber = (num) => {
             setPersons(persons.concat(newPerson))
             
         })
+
         setNotification(`Added ${newPerson['name']}`)
         setTimeout(() => setNotification(null),2000)
-        } else if (!isNumber(newNumber)) {
-          setNotification(`${newNumber} is not a number`)
-          setTimeout(() => setNotification(null),2000)
+        } 
+          else if (!isNumber(newNumber)) {
+            setNotification(`${newNumber} is not a number`)
+            setTimeout(() => setNotification(null),2000)
         }
-        
     }
       resetNewName();
       resetNewNumber();
       resetNewPerson();
-      resetUpdatePerson();
+     // resetUpdatePerson();
   }
       
  // new number handler, new number to add
@@ -146,10 +151,13 @@ const isNumber = (num) => {
   // submit new person, check if perosn exists
   // sets state of updat person to new number, same name, same id
   const checkUpdatePersonExists = () => {
+    let flag = false;
     for (let i = 0; i < persons.length; i++) {
       if (persons[i]['name'].toLowerCase() === newName.toLowerCase()) {
+        flag = true;
         Object.assign(updatePerson, persons[i]);
         setUpdatePerson(updatePerson);
+        return flag;
       } 
     }
   }
@@ -223,17 +231,15 @@ const isNumber = (num) => {
 
       <Notification notification={notification} />
 
-
       <Filter filterHandler={filterNameHandler} filter={filter} submitFilter={submitFilter} />
 
       <New_Person newNameHandler={newNameHandler} newName={newName} newNumberHandler={newNumberHandler} 
                   newNumber={newNumber} newNameSubmit={newPersonSubmit} debugNewNumber={newNumber} debugNewName={newName} />
 
-
-      
       <h2>Numbers:</h2>
         
         <All_Persons persons={persons} deletePerson={deletePersonById} />
+
     </div>
   )
 }

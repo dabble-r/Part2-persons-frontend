@@ -10,6 +10,8 @@ const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
+  const [newPerson, setNewPerson] = useState({});
+  const [updatePerson, setUpdatePerson] = useState({});
   const [filter, setFilter] = useState('');
   const [filterObj, setFilterObj] = useState({});
   
@@ -21,84 +23,80 @@ useEffect(() => {
       .then(initialPersons=>setPersons(initialPersons))
 },[])
 
-/*
-// create new person on db
-personsService 
-  .create(personObj)
-  .then(returnPerson => {
-    setPersons(persons.concat(returnPerson))
-    resetNewName()
-    resetNewNumber()
-  })
-
-// update person on db
-  personsService 
-    .update(id, changedPerson) 
-    .then(returnPerson => {
-      setPersons(persons.concat(returnPerson))
-      resetNewName()
-      resetNewNumber()
-    })
-  */
-
   // update input name to add
   const newNameHandler = (event) => {
     event.preventDefault();
     setNewName(event.target.value)
   }
 
-//check if name to add exists
+
+// check if name to add exists
+// made redundant by checkFilterExists fucnction
+/*
   const newNameExists = () => {
+    let flag;
     for (let i = 0; i < persons.length; i++) {
       if (!persons[i]['name']) {
         return false;
-      } else if (persons[i]['name'].toLowerCase() === newName.toLowerCase()) {
-        return true;
+      } 
+      if (persons[i]['name'].toLowerCase() === newName.toLowerCase()) {
+        flag = true;
+        Object.assign(newPerson, persons[i])
+        setNewPerson(newPerson)
       }
     }
+    return flag === true;
   }
+*/
 
  // id generator for new person
- 
 const idGenerator = () => {
   let temp = Math.floor(Math.random() * 1000);
   return temp;
 }
 
-
  // if name to add does not exists, add to perosns array of objs
   const newPersonSubmit = (event) => {
     event.preventDefault();
-    let ranId = String(idGenerator());
+    checkUpdatePersonExists();
+    //console.log('found', updatePerson)
 
-    let personObj = {};
-      if (newNameExists()) {
-        window.alert(`${newName} already exists!`)
-      } else if (!newNameExists()) {
-        personObj['name'] = newName;
-        personObj['number'] = newNumber;
-        personObj['id'] = ranId;
-      }
+      if (updatePerson['name']) {
+        //console.log('found', filterObj)
+        let id = updatePerson['id'];
+        if (window.confirm(`${newName} already exists! Would you like to update the phone number?`)) {
+          updatePerson['number'] = newNumber;
+          // update found perosn with new number
+          personsService  
+            .update(id, updatePerson)
+            .then(returnPerson => {
+              setPersons(persons.map(ele => ele.id !== id ? ele : returnPerson));
+            })
+        }
+      } 
+      if (!updatePerson['name']) {
+        let ranId = String(idGenerator());
+        newPerson['name'] = newName;
+        newPerson['number'] = newNumber;
+        newPerson['id'] = ranId;
+          setNewPerson(newPerson);
+      // create new person if no person found
       personsService 
-        .create(personObj)
+        .create(newPerson)
         .then(returnPerson => {
-          setPersons(persons.concat(returnPerson))
-     })
+          setPersons(persons.concat(newPerson))
+          
+      })
+    }
       resetNewName();
       resetNewNumber();
-    //console.log(newName)
+      resetNewPerson();
+      resetUpdatePerson();
   }
+      
 
- // reset new name to add
-  const resetNewName = () => {
-    setNewName('');
-  }
 
- // reset new humber to add
-  const resetNewNumber = () => {
-    setNewNumber('');
-  }
-
+ 
  // new number handler, new number to add
   const newNumberHandler = (event) => {
     event.preventDefault();
@@ -117,17 +115,30 @@ const idGenerator = () => {
       if (persons[i]['name'].toLowerCase() === filter.toLowerCase()) {
         filterObj['name'] = persons[i]['name'];
         filterObj['number'] = persons[i]['number'];
+        filterObj['id'] = persons[i]['id'];
         setFilterObj(filterObj);
       } 
     }
   }
+  
+  // submit new person, check if perosn exists
+  // sets state of updat person to new number, same name, same id
+  const checkUpdatePersonExists = () => {
+    for (let i = 0; i < persons.length; i++) {
+      if (persons[i]['name'].toLowerCase() === newName.toLowerCase()) {
+        Object.assign(updatePerson, persons[i]);
+        setUpdatePerson(updatePerson);
+      } 
+    }
+  }
 
+  
   // on click, dispay alert message with filtered name if it exists
   const submitFilter = (event) => {
     event.preventDefault();
     checkFilterExists();
     if (filterObj['name']) {
-      window.alert(`${filterObj['name']} : ${filterObj['number']}`)
+      window.confirm(`${filterObj['name']} : ${filterObj['number']}`)       
     } else {
       window.alert('Name does not exist')
     }
@@ -135,18 +146,43 @@ const idGenerator = () => {
     resetFilterObj()
   }
 
+  // reset the filtered name
   const resetFilter = () => {
     setFilter('');
   }
 
+  // reset to initila state the person obj, output form name filter
   const resetFilterObj = () => {
     setFilterObj({});
   }
 
+  // reset new name to add
+  const resetNewName = () => {
+    setNewName('');
+  }
+
+ // reset new humber to add
+  const resetNewNumber = () => {
+    setNewNumber('');
+  }
+
+  // reset newPerson to initla state
+  const resetNewPerson = () => {
+    Object.assign(newPerson, {})
+    setNewPerson(newPerson);
+  }
+
+  const resetUpdatePerson = () => {
+    Object.assign(updatePerson, {})
+    setUpdatePerson(updatePerson);
+  }
+
+  // remove a person form the phonebook with delete functionaility
   const deletePersonById = (event) => {
     event.preventDefault();
     let id = event.target.value;
-    
+    let name = event.target.name;
+    window.confirm(`Are you sure you want to delete ${name}`);
     personsService  
       .deleteById(id)
       .then(returnPersons => setPersons(persons.filter(ele => ele.id !== id)))

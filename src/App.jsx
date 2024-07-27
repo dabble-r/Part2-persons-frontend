@@ -15,6 +15,7 @@ const App = () => {
   const [updatePerson, setUpdatePerson] = useState({});
   const [filter, setFilter] = useState('');
   const [filterObj, setFilterObj] = useState({});
+  const [notification, setNotification] = useState(null);
   
 
 // effect hook, render once, initial state of persons array (db.json)
@@ -88,6 +89,8 @@ const idGenerator = () => {
           setPersons(persons.concat(newPerson))
           
       })
+      setNotification(`Added ${newPerson['name']}`)
+      setTimeout(() => setNotification(null),2000)
     }
       resetNewName();
       resetNewNumber();
@@ -95,9 +98,6 @@ const idGenerator = () => {
       resetUpdatePerson();
   }
       
-
-
- 
  // new number handler, new number to add
   const newNumberHandler = (event) => {
     event.preventDefault();
@@ -133,6 +133,18 @@ const idGenerator = () => {
     }
   }
 
+  // remove a person form the phonebook with delete functionaility
+  const deletePersonById = (event) => {
+    event.preventDefault();
+    let id = event.target.value;
+    let name = event.target.name;
+    window.confirm(`Are you sure you want to delete ${name}`);
+    personsService  
+      .deleteById(id)
+      .then(returnPersons => setPersons(persons.filter(ele => ele.id !== id)))
+      setNotification(`Deleted ${name}`)
+      setTimeout(() => setNotification(null),2000)
+  }
   
   // on click, dispay alert message with filtered name if it exists
   const submitFilter = (event) => {
@@ -178,22 +190,13 @@ const idGenerator = () => {
     setUpdatePerson(updatePerson);
   }
 
-  // remove a person form the phonebook with delete functionaility
-  const deletePersonById = (event) => {
-    event.preventDefault();
-    let id = event.target.value;
-    let name = event.target.name;
-    window.confirm(`Are you sure you want to delete ${name}`);
-    personsService  
-      .deleteById(id)
-      .then(returnPersons => setPersons(persons.filter(ele => ele.id !== id)))
-  }
+  
 
   return (
     <div>
       <h1>Phonebook</h1>
 
-      <Notification notification={} />
+      <Notification notification={notification} />
 
 
       <Filter filterHandler={filterNameHandler} filter={filter} submitFilter={submitFilter} />

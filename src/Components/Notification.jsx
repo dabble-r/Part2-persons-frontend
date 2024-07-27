@@ -3,7 +3,7 @@ const Notification = (props) => {
   return (
     <>
       <div>
-        <p> {props.notification} </p>
+        <h2> {props.notification} </h2>
       </div>
     </>
   )

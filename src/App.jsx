@@ -3,6 +3,7 @@ import axios from 'axios'
 import Filter from './Components/Filter'
 import New_Person from './Components/New_Person'
 import All_Persons from './Components/All_Persons'
+import Notification from './Components/Notification'
 import personsService from './services/persons'
 
 const App = () => {
@@ -191,6 +192,9 @@ const idGenerator = () => {
   return (
     <div>
       <h1>Phonebook</h1>
+
+      <Notification notification={} />
+
 
       <Filter filterHandler={filterNameHandler} filter={filter} submitFilter={submitFilter} />
 

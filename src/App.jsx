@@ -11,6 +11,7 @@ const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
+  const [numDash, setNumDash] = useState('');
   const [newPerson, setNewPerson] = useState({});
   const [updatePerson, setUpdatePerson] = useState({});
   const [filter, setFilter] = useState('');
@@ -68,60 +69,97 @@ const isNumber = (num) => {
   return true;
 }
 
+//check phone number has 10 digits
+const isCorrectLength = (num) => {
+  
+    return num.length === 10;
+ 
+}
+
+// insert dashes at correct intervals in 10 digit phone number
+const insertDash = (num) => {
+  if (isNumber(num)) {
+    if (isCorrectLength(num)) {
+      let arr = num.split('');
+      let i = 0;
+      while (i < arr.length) {
+        //console.log(i)
+        if (i === 3) {
+          arr.splice(i,0,'-')
+        }
+        if (i === 7) {
+          arr.splice(i,0,'-')
+        }
+        i++
+      }
+        return arr.join('') 
+      } else {
+        setNotification(`${num} must have an area code followed by 7 digits`)
+      }
+    } else {
+      setNotification(`${num} must be a number`)
+    }
+  }
+
 
  // if name to add does not exists, add to perosns array of objs
   const newPersonSubmit = (event) => {
     event.preventDefault();
     //checkUpdatePersonExists();
     //console.log('found', updatePerson)
-
+    
       if (checkUpdatePersonExists()) {
-        let id = updatePerson['id'];
-          //console.log('updateperson', updatePerson)
         if (window.confirm(`${newName} already exists! Would you like to update the phone number?`)) {
-          if (isNumber(newNumber)) {
-            console.log('number', isNumber(newNumber))
-            updatePerson['number'] = newNumber;
+              //console.log('numDashed', insertDash(numDash))
+              let numUpdate = insertDash(numDash);
+              let id = updatePerson['id'];
+              updatePerson['number'] = numUpdate;
 
-            // update found person with new number
-          personsService  
-            .update(id, updatePerson)
-            .then(returnPerson => {
-                setPersons(persons.map(ele => ele.id !== id ? ele : returnPerson));
+              //console.log('update person', updatePerson)
+
+               // update found person with new number
+              personsService  
+                .update(id, updatePerson)
+                .then(returnPerson => {
+                   setPersons(persons.map(ele => ele.id !== id ? ele : returnPerson));
               })
-            .catch(error => {
-                setNotification(`There was an error updating ${updatePerson['name']} \n ${error}`)
+                .catch(error => {
+                   setNotification(`There was an error updating ${updatePerson['name']} \n ${error}`)
               })
-          } else if (!isNumber(newNumber)) {
-            setNotification(`${newNumber} is not a number`)
-            setTimeout(() => setNotification(null), 2000)
-          } 
-        }
+            } else if (!isCorrectLength(newNumber)) {
+              setNotification(`${newNumber} must be a number with 10 digits`)
+              setTimeout(() => setNotification(null), 2000)
+            } 
+          
+        
       } 
       else if (!checkUpdatePersonExists()) {
-        
         if (isNumber(newNumber)) {
-          let ranId = String(idGenerator());
-          newPerson['name'] = newName;
-          newPerson['number'] = newNumber;
-          newPerson['id'] = ranId;
-            setNewPerson(newPerson);
+          if (isCorrectLength(newNumber)) {
+            let numDash = insertDash(newNumber);
+            setNewNumber(numDash);
+              //console.log(newNumber)
+            let ranId = String(idGenerator());
+              newPerson['name'] = newName;
+              newPerson['number'] = newNumber;
+              newPerson['id'] = ranId;
+               setNewPerson(newPerson);
 
-        // create new person if no person found
-        personsService 
-          .create(newPerson)
-          .then(returnPerson => {
-            setPersons(persons.concat(newPerson))
-            
-        })
-
-        setNotification(`Added ${newPerson['name']}`)
-        setTimeout(() => setNotification(null),2000)
-        } 
-          else if (!isNumber(newNumber)) {
-            setNotification(`${newNumber} is not a number`)
+            // create new person if no person found
+            personsService 
+              .create(newPerson)
+              .then(returnPerson => {
+                setPersons(persons.concat(newPerson))
+                
+            })
+            setNotification(`Added ${newPerson['name']}`)
             setTimeout(() => setNotification(null),2000)
-        }
+          } 
+            else if (!isCorrectLength(newNumber)) {
+              setNotification(`${newNumber} must be a number with 10 digits`)
+              setTimeout(() => setNotification(null),2000)
+          }
+        } 
     }
       resetNewName();
       resetNewNumber();
@@ -133,6 +171,7 @@ const isNumber = (num) => {
   const newNumberHandler = (event) => {
     event.preventDefault();
     setNewNumber(event.target.value)
+    setNumDash(event.target.value);
   }
 
   // set name to filter 

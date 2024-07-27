@@ -59,8 +59,13 @@ const idGenerator = () => {
 
 //functio to check if newNumber is a number
 const isNumber = (num) => {
-  //let test = Number(num);
-  return Number(num) == num;
+  let arr = num.split('');
+  for (let i = 0; i < arr.length; i++) {
+    if (Number(arr[i]) != arr[i]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 

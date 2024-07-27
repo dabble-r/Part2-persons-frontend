@@ -12,7 +12,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
   const [filterObj, setFilterObj] = useState({});
-  const [id, setId] = useState([]);
+  
 
 // effect hook, render once, initial state of persons array (db.json)
 useEffect(() => {
@@ -50,31 +50,34 @@ personsService
 //check if name to add exists
   const newNameExists = () => {
     for (let i = 0; i < persons.length; i++) {
-      if (persons[i]['name'].toLowerCase() === newName.toLowerCase()) {
+      if (!persons[i]['name']) {
+        return false;
+      } else if (persons[i]['name'].toLowerCase() === newName.toLowerCase()) {
         return true;
       }
     }
   }
 
  // id generator for new person
- /*
+ 
 const idGenerator = () => {
-  let temp = Math.floor(Math.random() * 1000)
-  setId(id.concat(temp))
+  let temp = Math.floor(Math.random() * 1000);
+  return temp;
 }
-  */
+
 
  // if name to add does not exists, add to perosns array of objs
   const newPersonSubmit = (event) => {
     event.preventDefault();
-    
+    let ranId = String(idGenerator());
+
     let personObj = {};
       if (newNameExists()) {
         window.alert(`${newName} already exists!`)
       } else if (!newNameExists()) {
         personObj['name'] = newName;
         personObj['number'] = newNumber;
-        personObj['id'] = id.pop();
+        personObj['id'] = ranId;
       }
       personsService 
         .create(personObj)
@@ -140,6 +143,14 @@ const idGenerator = () => {
     setFilterObj({});
   }
 
+  const deletePersonById = (event) => {
+    event.preventDefault();
+    let id = event.target.value;
+    
+    personsService  
+      .deleteById(id)
+      .then(returnPersons => setPersons(persons.filter(ele => ele.id !== id)))
+  }
 
   return (
     <div>
@@ -154,7 +165,7 @@ const idGenerator = () => {
       
       <h2>Numbers:</h2>
         
-        <All_Persons persons={persons} />
+        <All_Persons persons={persons} deletePerson={deletePersonById} />
     </div>
   )
 }

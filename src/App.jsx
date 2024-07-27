@@ -57,6 +57,12 @@ const idGenerator = () => {
   return temp;
 }
 
+//functio to check if newNumber is a number
+const isNumber = (num) => {
+  return typeof num === 'number';
+}
+
+
  // if name to add does not exists, add to perosns array of objs
   const newPersonSubmit = (event) => {
     event.preventDefault();
@@ -66,31 +72,46 @@ const idGenerator = () => {
       if (updatePerson['name']) {
         //console.log('found', filterObj)
         let id = updatePerson['id'];
+        let number = updatePerson['number']
         if (window.confirm(`${newName} already exists! Would you like to update the phone number?`)) {
-          updatePerson['number'] = newNumber;
-          // update found perosn with new number
+          if (isNumber(number)) {
+            updatePerson['number'] = newNumber;
+            // update found perosn with new number
           personsService  
             .update(id, updatePerson)
             .then(returnPerson => {
-              setPersons(persons.map(ele => ele.id !== id ? ele : returnPerson));
-            })
+                setPersons(persons.map(ele => ele.id !== id ? ele : returnPerson));
+              })
+            .catch(error => {
+                setNotification(`There was an error updating ${updatePerson['name']}`)
+              })
+          } else if (!isNumber(number)) {
+            setNotification(`${newNumber} is not a number`)
+            setTimeout(() => setNotification(null), 2000)
+          } 
         }
       } 
       if (!updatePerson['name']) {
-        let ranId = String(idGenerator());
-        newPerson['name'] = newName;
-        newPerson['number'] = newNumber;
-        newPerson['id'] = ranId;
-          setNewPerson(newPerson);
-      // create new person if no person found
-      personsService 
-        .create(newPerson)
-        .then(returnPerson => {
-          setPersons(persons.concat(newPerson))
-          
-      })
-      setNotification(`Added ${newPerson['name']}`)
-      setTimeout(() => setNotification(null),2000)
+        if (isNumber(newNumber)) {
+          let ranId = String(idGenerator());
+          newPerson['name'] = newName;
+          newPerson['number'] = newNumber;
+          newPerson['id'] = ranId;
+            setNewPerson(newPerson);
+        // create new person if no person found
+        personsService 
+          .create(newPerson)
+          .then(returnPerson => {
+            setPersons(persons.concat(newPerson))
+            
+        })
+        setNotification(`Added ${newPerson['name']}`)
+        setTimeout(() => setNotification(null),2000)
+        } else if (!isNumber(newNumber)) {
+          setNotification(`${newNumber} is not a number`)
+          setTimeout(() => setNotification(null),2000)
+        }
+        
     }
       resetNewName();
       resetNewNumber();
@@ -141,7 +162,11 @@ const idGenerator = () => {
     window.confirm(`Are you sure you want to delete ${name}`);
     personsService  
       .deleteById(id)
-      .then(returnPersons => setPersons(persons.filter(ele => ele.id !== id)))
+      .then(returnPerson => setPersons(persons.filter(ele => ele.id !== id)))
+      .catch(error => {
+        setNotification(`${name} already deleted!`)
+        setTimeout(() => setNotification(null),1000)
+      })
       setNotification(`Deleted ${name}`)
       setTimeout(() => setNotification(null),2000)
   }

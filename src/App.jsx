@@ -71,15 +71,11 @@ const isNumber = (num) => {
 
 //check phone number has 10 digits
 const isCorrectLength = (num) => {
-  
     return num.length === 10;
- 
 }
 
 // insert dashes at correct intervals in 10 digit phone number
 const insertDash = (num) => {
-  if (isNumber(num)) {
-    if (isCorrectLength(num)) {
       let arr = num.split('');
       let i = 0;
       while (i < arr.length) {
@@ -93,29 +89,32 @@ const insertDash = (num) => {
         i++
       }
         return arr.join('') 
-      } else {
-        setNotification(`${num} must have an area code followed by 7 digits`)
-      }
-    } else {
-      setNotification(`${num} must be a number`)
-    }
-  }
+} 
+  
 
 
  // if name to add does not exists, add to perosns array of objs
   const newPersonSubmit = (event) => {
     event.preventDefault();
     //checkUpdatePersonExists();
-    //console.log('found', updatePerson)
     
+    if (isNumber(newNumber)) {
+      if (!isCorrectLength(newNumber)) {
+        setNotification(`${newNumber} must have an area code followed by 7 digits`);
+      }
+      setTimeout(() => setNotification(null), 2000);
+    } else {
+      setNotification(`${newNumber} must be a number`);
+      setTimeout(() => setNotification(null), 2000);
+    } 
+    
+    if (isNumber(newNumber) && isCorrectLength(newNumber)) {
       if (checkUpdatePersonExists()) {
         if (window.confirm(`${newName} already exists! Would you like to update the phone number?`)) {
               //console.log('numDashed', insertDash(numDash))
               let numUpdate = insertDash(numDash);
               let id = updatePerson['id'];
               updatePerson['number'] = numUpdate;
-
-              //console.log('update person', updatePerson)
 
                // update found person with new number
               personsService  
@@ -126,20 +125,15 @@ const insertDash = (num) => {
                 .catch(error => {
                    setNotification(`There was an error updating ${updatePerson['name']} \n ${error}`)
               })
-            } else if (!isCorrectLength(newNumber)) {
-              setNotification(`${newNumber} must be a number with 10 digits`)
-              setTimeout(() => setNotification(null), 2000)
-            } 
-          
-        
-      } 
-      else if (!checkUpdatePersonExists()) {
-        if (isNumber(newNumber)) {
-          if (isCorrectLength(newNumber)) {
+              setNotification(`Updated phone number for ${updatePerson['name']}`);
+              setTimeout(() => setNotification(null), 2000);
+         } 
+       } 
+      if (!checkUpdatePersonExists()) {
             let numDash = insertDash(newNumber);
             setNewNumber(numDash);
               //console.log(newNumber)
-            let ranId = String(idGenerator());
+              let ranId = String(idGenerator());
               newPerson['name'] = newName;
               newPerson['number'] = newNumber;
               newPerson['id'] = ranId;
@@ -150,17 +144,13 @@ const insertDash = (num) => {
               .create(newPerson)
               .then(returnPerson => {
                 setPersons(persons.concat(newPerson))
-                
             })
             setNotification(`Added ${newPerson['name']}`)
             setTimeout(() => setNotification(null),2000)
           } 
-            else if (!isCorrectLength(newNumber)) {
-              setNotification(`${newNumber} must be a number with 10 digits`)
-              setTimeout(() => setNotification(null),2000)
-          }
-        } 
-    }
+        } else {
+          setNotification(`${newNumber} must be a number beginning with a 3 digit aread code followed by 7 digits`)
+        }
       resetNewName();
       resetNewNumber();
       resetNewPerson();

@@ -115,7 +115,7 @@ const insertDash = (num) => {
               let numUpdate = insertDash(numDash);
               let id = updatePerson['id'];
               updatePerson['number'] = numUpdate;
-
+              console.log(numUpdate)
                // update found person with new number
               personsService  
                 .update(id, updatePerson)
@@ -135,7 +135,7 @@ const insertDash = (num) => {
               //console.log(newNumber)
               let ranId = String(idGenerator());
               newPerson['name'] = newName;
-              newPerson['number'] = newNumber;
+              newPerson['number'] = insertDash(newNumber);
               newPerson['id'] = ranId;
                setNewPerson(newPerson);
 
@@ -149,7 +149,7 @@ const insertDash = (num) => {
             setTimeout(() => setNotification(null),2000)
           } 
         } else {
-          setNotification(`${newNumber} must be a number beginning with a 3 digit aread code followed by 7 digits`)
+          setNotification(`${newNumber} must be a number beginning with a 3 digit area code followed by 7 digits`);
         }
       resetNewName();
       resetNewNumber();
@@ -263,12 +263,12 @@ const insertDash = (num) => {
     <div>
       <h1>Phonebook</h1>
 
-      <Notification notification={notification} />
+        <Notification notification={notification} />
 
-      <Filter filterHandler={filterNameHandler} filter={filter} submitFilter={submitFilter} />
+        <Filter filterHandler={filterNameHandler} filter={filter} submitFilter={submitFilter} />
 
-      <New_Person newNameHandler={newNameHandler} newName={newName} newNumberHandler={newNumberHandler} 
-                  newNumber={newNumber} newNameSubmit={newPersonSubmit} debugNewNumber={newNumber} debugNewName={newName} />
+        <New_Person newNameHandler={newNameHandler} newName={newName} newNumberHandler={newNumberHandler} 
+                    newNumber={newNumber} newNameSubmit={newPersonSubmit} debugNewNumber={newNumber} debugNewName={newName} />
 
       <h2>Numbers:</h2>
         

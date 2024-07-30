@@ -32,26 +32,6 @@ useEffect(() => {
     setNewName(event.target.value)
   }
 
-
-// check if name to add exists
-// made redundant by checkFilterExists fucnction
-/*
-  const newNameExists = () => {
-    let flag;
-    for (let i = 0; i < persons.length; i++) {
-      if (!persons[i]['name']) {
-        return false;
-      } 
-      if (persons[i]['name'].toLowerCase() === newName.toLowerCase()) {
-        flag = true;
-        Object.assign(newPerson, persons[i])
-        setNewPerson(newPerson)
-      }
-    }
-    return flag === true;
-  }
-*/
-
  // id generator for new person
 const idGenerator = () => {
   let temp = Math.floor(Math.random() * 1000);

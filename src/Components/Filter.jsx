@@ -10,9 +10,7 @@ const Filter = (props) => {
                   <span><br></br></span>
                     <button type="submit" onClick={props.submitFilter}>search</button>
                   </div>
-                  <div>
-                    debug: {props.filter}
-                  </div>
+                  
                 </div>
               </form>
          </>)

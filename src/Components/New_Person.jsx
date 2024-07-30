@@ -17,11 +17,6 @@ const New_Person = (props) => {
           <button type="submit" onClick={props.newNameSubmit}>add</button>
         </div>
 
-        <div>
-          debug: {props.debugNewName}
-          <br></br>
-          debug: {props.debugNewNumber}
-        </div>
       </form>
     </>
   )
